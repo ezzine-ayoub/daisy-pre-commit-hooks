@@ -1,0 +1,110 @@
+- id: check_duplicate_method_names
+  name: Check for duplicate method names
+  entry: check_duplicate_method_names
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: detect-raw-sql-delete-insert
+  name: Detect raw SQL DELETE/INSERT
+  entry: check_sql
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: class-property-checker
+  name: Check for return in write/copy/create/unlink
+  entry: check_for_return
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-xml-header
+  name: Check XML header
+  entry: check_xml_header
+  language: python
+  types: [xml]
+  additional_dependencies: ["."]
+
+- id: check-xml-closing-tags
+  name: Check XML closing tags
+  entry: check_xml_closing_tags
+  language: python
+  types: [xml]
+  additional_dependencies: ["."]
+
+- id: check-report-template
+  name: Check report template
+  entry: check_report_template
+  language: python
+  types: [xml]
+  additional_dependencies: ["."]
+
+- id: check-compute-function
+  name: Check compute function exists
+  entry: check_compute_function
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-manifest-fields
+  name: Check manifest fields
+  entry: check_requirements
+  language: python
+  files: ^.*__manifest__.py$
+  additional_dependencies: ["."]
+
+- id: check-print-usage
+  name: Check print usage
+  entry: check_print_usage
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-duplicate-ids
+  name: Check duplicate XML IDs
+  entry: check_duplicate_ids
+  language: python
+  types: [xml]
+  additional_dependencies: ["."]
+
+- id: check-sudo-comment
+  name: Ensure sudo has inline comment
+  entry: check_sudo_comment
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-long-functions
+  name: Check long functions
+  entry: check_long_functions
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-module-prefix
+  name: Check models naming
+  entry: check_model_file
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-odoo-models-naming
+  name: Check module folder naming
+  entry: check_module_names
+  language: python
+  types: [python]
+  additional_dependencies: ["."]
+
+- id: check-xml-filenames
+  name: Check XML filenames
+  entry: check_xml_filenames
+  language: python
+  types: [xml]
+  additional_dependencies: ["."]
+
+- id: check-lines-max
+  name: Check max line length
+  entry: check_lines_max
+  language: python
+  additional_dependencies: ["."]
