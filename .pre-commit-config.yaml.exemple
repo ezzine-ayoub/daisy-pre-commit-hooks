@@ -1,0 +1,66 @@
+exclude: 'daisy-pre-commit-hooks/scripts/.*|odoo18/(check_manifest|wait-for-psql)\.py|check_duplicate_ids\.py|.idea/.*'
+repos:
+  #     Standard code quality hooks
+#  - repo: https://github.com/pre-commit/pre-commit-hooks
+#    rev: v5.0.0
+#    hooks:
+#      - id: trailing-whitespace
+#        files: '.*|[^.].*'
+#
+#      - id: check-yaml
+#        files: '.*|[^.].*\.ya?ml$'
+#
+#      - id: check-added-large-files
+#        files: '.*|[^.].*'
+#        exclude: 'odoo18/.*'
+
+#  - repo: https://github.com/pre-commit/mirrors-pylint
+#    rev: v3.0.0a5
+#    hooks:
+#      - id: pylint
+#        name: pylint
+#        entry: pylint
+#        language: system
+#        types: [ python ]
+#        args:
+#          - "--disable=all"
+#          - "--enable=unused-variable"
+#          - "--enable=missing-function-docstring"
+
+  - repo: https://github.com/Daisy-Consulting/daisy-pre-commit-hooks
+    rev: v1.1.5
+    hooks:
+#      ##########################################################################################
+#      ######################################just for new new ####################################
+#      ##########################################################################################
+      - id: check-xml-header
+      - id: check-manifest-fields
+        args:
+          - "--required_keys=name,version,category,description,author"
+      - id: check-print-usage
+      - id: check-sudo-comment
+      - id: check-odoo-models-naming
+        args:
+          - "--addons=.."
+          - "--allowed-prefixes=dc_,modify_"
+          - "--IGNORE_DIRECTORIES="
+      - id: check-xml-filenames
+        args:
+          - "--addons="
+          - "--allowed-prefixes=dc_,inherit"
+          - "--IGNORE_DIRECTORIES="
+        pass_filenames: false
+      - id: detect-raw-sql-delete-insert
+      ################################################################################################################################
+      ######################################for old and new if this project old comment this part ####################################
+      ################################################################################################################################
+      - id: check_duplicate_method_names
+      - id: check-for-return
+      - id: check-xml-closing-tags
+
+      - id: check-report-template
+        args:
+          - "--addons="
+          - '--MANDATORY_FIELDS={"ir.ui.view": ["name", "model"],"ir.actions.act_window": ["name", "res_model", "view_mode"],"ir.actions.report": ["name", "model", "report_name"]}'
+      - id: check-compute-function
+      - id: check-duplicate-ids

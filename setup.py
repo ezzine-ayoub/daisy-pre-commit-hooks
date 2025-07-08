@@ -24,6 +24,7 @@ setup(
             'check_module_names = scripts.check_module_names:main',
             'check_xml_filenames = scripts.check_xml_filenames:main',
             'check_lines_max = scripts.check_lines_max:main',
+            'check_branch_push = scripts.check_branch_push:main',
         ]
     },
     classifiers=[

@@ -23,11 +23,37 @@ pre-commit install
 pre-commit run
 pre-commit run --all-files
 pre-commit clean
+
+
+# Créer un environnement virtuel
+python -m venv .venv
+
+# Autoriser l'exécution des scripts uniquement pour la session actuelle
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+# Activer l'environnement virtuel
+.venv\Scripts\Activate
+
+# Installer pre-commit
+pip install pre-commit
+
+# Initialiser pre-commit dans le projet (nécessite un fichier .pre-commit-config.yaml)
+pre-commit install
+
+# Exécuter les hooks sur les fichiers modifiés uniquement
+pre-commit run
+
+# Exécuter les hooks sur tous les fichiers du projet
+pre-commit run --all-files
+
+# Nettoyer les caches de pre-commit
+pre-commit clean
+
 ```
 ```bash
 exclude: 'daisy-pre-commit-hooks/scripts/.*|odoo18/(check_manifest|wait-for-psql)\.py|check_duplicate_ids\.py|.idea/.*'
 repos:
-  # Standard code quality hooks
+  #     Standard code quality hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -46,60 +72,53 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: pylint --max-line-length=120
+        entry: pylint
         language: system
         types: [ python ]
         args:
-          - "--max-line-length=120"
           - "--disable=all"
-          - "--enable=unused-variable,invalid-name"
+          - "--enable=unused-variable"
           - "--enable=missing-function-docstring"
 
   - repo: https://github.com/Daisy-Consulting/daisy-pre-commit-hooks
     rev: main
     hooks:
-      ##########################################################################################
-      ######################################just for new new ####################################
-      ##########################################################################################
+#      ##########################################################################################
+#      ######################################just for new new ####################################
+#      ##########################################################################################
       - id: check-xml-header
-      - id: check-print-usage
-      - id: check-sudo-comment
-      - id: check-long-functions
-      - id: check-xml-filenames
-        args:
-          - "--addons="
-          - "--allowed-prefixes="
-          - "--IGNORE_DIRECTORIES="
-      - id: check-lines-max
       - id: check-manifest-fields
         args:
           - "--required_keys=name,version,category,description,author"
-
+      - id: check-print-usage
+      - id: check-sudo-comment
       - id: check-odoo-models-naming
         args:
-          - "--addons="
-          - "--allowed-prefixes="
+          - "--addons=.."
+          - "--allowed-prefixes=dc_,modify_"
           - "--IGNORE_DIRECTORIES="
+      - id: check-xml-filenames
+        args:
+          - "--addons="
+          - "--allowed-prefixes=dc_,inherit"
+          - "--IGNORE_DIRECTORIES="
+      - id: check-lines-max
+        args:
+          - "--max_line_length=120"
+        pass_filenames: false
       - id: detect-raw-sql-delete-insert
       ################################################################################################################################
       ######################################for old and new if this project old comment this part ####################################
       ################################################################################################################################
       - id: check_duplicate_method_names
-      - id: class-property-checker
+      - id: check-for-return
       - id: check-xml-closing-tags
+
       - id: check-report-template
         args:
           - "--addons="
+          - '--MANDATORY_FIELDS={"ir.ui.view": ["name", "model"],"ir.actions.act_window": ["name", "res_model", "view_mode"],"ir.actions.report": ["name", "model", "report_name"]}'
       - id: check-compute-function
       - id: check-duplicate-ids
 
-
-
-
-
-#      - id: check-module-prefix
-#        args:
-#          - "--addons="
-#          - "--IGNORE_DIRECTORIES="
-#          - "--PREFIXES="
 ```

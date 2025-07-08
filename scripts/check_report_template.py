@@ -2,10 +2,12 @@ import os
 import re
 import sys
 import argparse
+import json
 sys.stdout.reconfigure(encoding='utf-8')
 
 parser = argparse.ArgumentParser(description="Check duplicate method names in Odoo classes")
 parser.add_argument('--addons', help='addons')
+parser.add_argument('--MANDATORY_FIELDS', help='MANDATORY_FIELDS')
 parser.add_argument('filenames', nargs='*', help='Files passed by pre-commit')
 args = parser.parse_args()
 
@@ -89,13 +91,13 @@ class ReportFieldChecker:
         print("⚠️ maybe name or id is incorrect or template in other module or not exist.")
         sys.exit(1)
 
-MANDATORY_FIELDS = {
-    "ir.ui.view": ["name", "model"],
-    "ir.actions.act_window": ["name", "res_model", "view_mode"],
-    "ir.actions.report": ["name", "model", "report_name"],
-
-}
-
+# MANDATORY_FIELDS = {
+#     "ir.ui.view": ["name", "model"],
+#     "ir.actions.act_window": ["name", "res_model", "view_mode"],
+#     "ir.actions.report": ["name", "model", "report_name"],
+#
+# }
+MANDATORY_FIELDS = dict(json.loads(args.MANDATORY_FIELDS))
 class XMLFieldValidator:
     def __init__(self, directory):
         self.directory = directory
@@ -135,13 +137,7 @@ class XMLFieldValidator:
                         print(f"❌ Missing fields for model='{record_model}': {missing}\n {clickable_path}")
                         has_error = True
 
-                    # Check if 'name' field contains a dot
-                    name_field = self._get_field_value(record_block)
-                    if name_field and '.' in name_field:
-                        line = self._find_line_number(original_content, record_block_original)
-                        clickable_path = f"file:///{file_path.replace(os.sep, '/')}:{line}"
-                        print(f"{clickable_path}\n❌ Invalid value for <field name='name'>: contains dot (.) → '{name_field}'")
-                        has_error = True
+
             return has_error
 
     def _extract_record_block(self, content, model):
@@ -162,7 +158,7 @@ class XMLFieldValidator:
         for idx, line in enumerate(lines):
             if block.strip() in line:
                 return idx + 1
-        # إذا ما لقاهاش مباشرة نحاول نقلب بطريقة أخرى
+
         position = content.find(block.strip())
         if position != -1:
             return content[:position].count('\n') + 1

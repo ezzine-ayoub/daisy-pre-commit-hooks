@@ -100,7 +100,7 @@ repos:
             ######################################for oldy if this project old comment this part ####################################
             ################################################################################################################################
             -   id: check_duplicate_method_names
-            -   id: class-property-checker
+            -   id: check-for-return
             -   id: check-xml-closing-tags
             -   id: check-report-template
                 args:

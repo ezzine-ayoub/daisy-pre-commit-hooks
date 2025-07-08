@@ -15,7 +15,7 @@ repos:
         types: [python]
         stages: [commit]
 
-      - id: class-property-checker
+      - id: check-for-return
         name: Check for missing return in write(), copy(), create() or unlink() methods
         entry: python scripts/check_for_return.py
         language: system
@@ -113,4 +113,11 @@ repos:
         entry: python scripts/check_lines_max.py
         language: system
         types: [python]
-        stages: [commit]
+        stages: [commit,push]
+
+      - id: check_branch_push
+        name: Check check branch push
+        entry: python scripts/check_branch_push.py
+        language: system
+        types: [python]
+        stages: [push]

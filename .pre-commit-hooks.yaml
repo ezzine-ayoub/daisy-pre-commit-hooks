@@ -12,7 +12,7 @@
   types: [python]
   additional_dependencies: ["."]
 
-- id: class-property-checker
+- id: check-for-return
   name: Check for return in write/copy/create/unlink
   entry: check_for_return
   language: python
@@ -106,5 +106,11 @@
 - id: check-lines-max
   name: Check max line length
   entry: check_lines_max
+  language: python
+  additional_dependencies: ["."]
+
+- id: check_branch_push
+  name: Check check branch push
+  entry: check_branch_push
   language: python
   additional_dependencies: ["."]

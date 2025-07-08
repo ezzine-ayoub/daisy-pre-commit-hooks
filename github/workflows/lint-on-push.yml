@@ -1,0 +1,46 @@
+name: Lint & Test on Push
+
+on:
+    push:
+        branches: [ main, dev ]
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        env:
+            GH_PAT_HOOKS: ${{ secrets.GH_PAT_HOOKS }}
+
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v3
+                with:
+                    fetch-depth: 2  # Needed to access HEAD~1
+
+            -   name: Setup git credentials for private hooks
+                run: |
+                    git config --global url."https://${GH_PAT_HOOKS}@github.com/".insteadOf "https://github.com/"
+
+            -   name: Set up Python
+                uses: actions/setup-python@v4
+                with:
+                    python-version: '3.10'
+
+            -   name: Upgrade pip and install dependencies
+                run: |
+                    pip install --upgrade pip
+                    pip install pre-commit pylint
+
+            -   name: Clean pre-commit cache
+                run: |
+                    pre-commit uninstall || true
+                    pre-commit clean
+
+            -   name: Run pre-commit only on last commit (fallback to all files on first commit)
+                run: |
+                    if git rev-parse HEAD~1 >/dev/null 2>&1; then
+                      echo "Running pre-commit on last commit only"
+                      pre-commit run --from-ref HEAD~1 --to-ref HEAD
+                    else
+                      echo "First commit detected or no previous commit, running on all files"
+                      pre-commit run --all-files
+                    fi
