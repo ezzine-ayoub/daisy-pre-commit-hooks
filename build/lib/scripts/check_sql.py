@@ -12,8 +12,8 @@ class SQLChecker:
                                 self\.env(\.cr)?              # capture self.env or self.env.cr
                                 | self\.pool\.cursor\(\)       # capture self.pool.cursor()
                             )
-                            \.execute\s*                      # method execute with optional spaces
-                            \(.*?(["'])                        # any argument within the parentheses
+                            \.(execute|sql)\s*                      # method execute with optional spaces
+                            \(.*?(["']{1,3})                        # any argument within the parentheses
                             \s*(INSERT|DELETE)\b        # match SQL commands INSERT, DELETE, UPDATE
                         )
                     ''', re.VERBOSE
