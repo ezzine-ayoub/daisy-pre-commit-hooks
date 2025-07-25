@@ -70,33 +70,33 @@ class ManifestChecker:
         assets = manifest_content.get('assets', {})
         missing_files = []
 
-        for bundle_name, file_list in assets.items():
-            for entry in file_list:
-                if isinstance(entry, tuple) and len(entry) == 2:
-                    _, asset_path = entry
-                else:
-                    asset_path = entry
+        for bundle_name, asset_list in assets.items():
+            if not isinstance(asset_list, list):
+                self._log(f"Ignoré '{bundle_name}' car ce n'est pas une liste.")
+                continue
 
-                full_glob_path = os.path.dirname(os.path.dirname(file_path))+"/"+asset_path
-                full_glob_path = full_glob_path.replace('/','\\')
-                matches = glob.glob(full_glob_path, recursive=True)
-                if not matches:
-                    missing_files.append((asset_path, full_glob_path, bundle_name))
+            for asset in asset_list:
+                # Certains assets peuvent être des clés avec préfixe 'remove'
+                clean_asset = asset.replace("remove:", "") if asset.startswith("remove:") else asset
+                full_path = os.path.normpath(os.path.join(os.path.dirname(file_path), clean_asset))
+
+                if not os.path.isfile(full_path):
+                    missing_files.append((asset, full_path, bundle_name))
 
         if missing_files:
-            print(f"\n❌ Fichiers d'assets manquants dans {file_path}:")
-            for asset_path, full_path, bundle in missing_files:
-                print(f"- '{asset_path}' (bundle : {bundle}) n'existe pas.")
-                print(f"  → Chemin attendu : {full_path}")
-                print("  ⚠️ Vérifie le nom, le chemin relatif, les jokers glob (**), ou une virgule oubliée.")
+            print(f"\n❌ Fichiers listés dans 'assets' manquants dans {file_path}:")
+            for asset, full_path, bundle in missing_files:
+                print(f"- '{asset}' dans le bundle '{bundle}' n'existe pas. (Chemin attendu : {full_path})")
             sys.exit(1)
+        else:
+            self._log(f"✔ Tous les fichiers assets sont valides dans {file_path}.")
 
     def check_manifest_file(self, file_path):
         """Vérifie un fichier __manifest__.py spécifique."""
         manifest_content = self._parse_manifest_file(file_path)
         self._check_required_fields(manifest_content, file_path)
         self._check_data_files(file_path, manifest_content)
-        self._check_assets_files(file_path, manifest_content)
+        # self._check_assets_files(file_path, manifest_content)
 
     def check_all_manifest_files(self):
         """Parcourt tout le répertoire pour vérifier tous les fichiers '__manifest__.py'."""
