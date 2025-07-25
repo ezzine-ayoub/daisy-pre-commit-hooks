@@ -79,10 +79,6 @@ class ManifestChecker:
             for asset in asset_list:
                 # Certains assets peuvent être des clés avec préfixe 'remove'
                 clean_asset = asset.replace("remove:", "") if asset.startswith("remove:") else asset
-                print(f"{clean_asset}")
-                print(f"{os.path.join(os.path.dirname(os.path.dirname(file_path)),clean_asset)}")
-                print(f"{os.path.normpath(os.path.join(os.path.dirname(file_path), clean_asset))}")
-                sys.exit(1)
                 full_path = os.path.normpath(os.path.join(os.path.dirname(file_path), clean_asset))
                 
                 if not os.path.isfile(full_path):
@@ -101,7 +97,7 @@ class ManifestChecker:
         manifest_content = self._parse_manifest_file(file_path)
         self._check_required_fields(manifest_content, file_path)
         self._check_data_files(file_path, manifest_content)
-        self._check_assets_files(file_path, manifest_content)
+        self._check_assets_files(os.path.dirname(file_path), manifest_content)
 
     def check_all_manifest_files(self):
         """Parcourt tout le répertoire pour vérifier tous les fichiers '__manifest__.py'."""
