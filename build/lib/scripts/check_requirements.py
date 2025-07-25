@@ -80,6 +80,8 @@ class ManifestChecker:
                 # Certains assets peuvent être des clés avec préfixe 'remove'
                 clean_asset = asset.replace("remove:", "") if asset.startswith("remove:") else asset
                 print(f"{clean_asset}")
+                print(f"{os.path.join(os.path.dirname(file_path),clean_asset)}")
+                print(f"{os.path.normpath(os.path.join(os.path.dirname(file_path), clean_asset))}")
                 sys.exit(1)
                 full_path = os.path.normpath(os.path.join(os.path.dirname(file_path), clean_asset))
                 
