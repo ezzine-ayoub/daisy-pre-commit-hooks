@@ -84,7 +84,7 @@ class ManifestChecker:
                     missing_files.append((asset_path, full_glob_path, bundle_name))
 
         if missing_files:
-            print(f"\n❌ Fichiers d'assets manquants dans {file_path}:")
+            print(f"\n❌ Fichiers d'assets manquants dans {os.path.dirname(os.path.dirname(file_path))}:")
             for asset_path, full_path, bundle in missing_files:
                 print(f"- '{asset_path}' (bundle : {bundle}) n'existe pas.")
                 print(f"  → Chemin attendu : {full_path}")
