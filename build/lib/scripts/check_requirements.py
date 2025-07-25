@@ -77,9 +77,16 @@ class ManifestChecker:
                     asset_path = entry
 
                 base_module_path = os.path.dirname(os.path.dirname(file_path))
-                full_glob_path = os.path.normpath(os.path.join(base_module_path, asset_path))
+                full_glob_path = os.path.join(base_module_path, asset_path)
+
+                # Remplacer les backslashes pour être compatible avec glob
+                full_glob_path = full_glob_path.replace("\\", "/")
+
                 matches = glob.glob(full_glob_path, recursive=True)
-                print(matches)
+
+                if self.debug:
+                    print(f"[DEBUG] Recherche glob: {full_glob_path} → Trouvés: {matches}")
+
                 if not matches:
                     missing_files.append((asset_path, full_glob_path, bundle_name))
 
