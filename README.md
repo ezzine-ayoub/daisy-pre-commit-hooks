@@ -37,7 +37,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 # Installer pre-commit
 pip install pre-commit
 
-# Initialiser pre-commit dans le projet (nécessite un fichier .pre-commit-config.yaml)
+# Initialiser pre-commit dans le projet (nécessite un fichier ..pre-commit-config.yaml)
 pre-commit install
 
 # Exécuter les hooks sur les fichiers modifiés uniquement
