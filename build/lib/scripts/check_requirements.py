@@ -69,8 +69,6 @@ class ManifestChecker:
         """Vérifie que tous les fichiers listés dans 'assets' existent (y compris les 'remove')."""
         assets = manifest_content.get('assets', {})
         missing_files = []
-        print(os.path.dirname(file_path))
-        sys.exit(1)
         for bundle_name, file_list in assets.items():
             for entry in file_list:
                 if isinstance(entry, tuple) and len(entry) == 2:
@@ -79,6 +77,8 @@ class ManifestChecker:
                     asset_path = entry
 
                 full_glob_path = os.path.dirname(os.path.dirname(file_path))+"/"+asset_path
+                print(full_glob_path)
+                sys.exit(1)
                 full_glob_path = full_glob_path.replace('/','\\')
                 matches = glob.glob(full_glob_path, recursive=True)
                 print(matches)
