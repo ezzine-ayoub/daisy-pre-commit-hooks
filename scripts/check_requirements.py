@@ -55,8 +55,6 @@ class ManifestChecker:
 
         for data_file in data_files:
             full_file_path = os.path.normpath(os.path.join(os.path.dirname(file_path), data_file))
-            print(os.path.isfile(full_file_path))
-            sys.exit(1)
             if not os.path.isfile(full_file_path):
                 missing_files.append((data_file, full_file_path))
 
