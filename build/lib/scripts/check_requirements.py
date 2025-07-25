@@ -52,10 +52,9 @@ class ManifestChecker:
         """Vérifie que tous les fichiers listés dans 'data' existent."""
         data_files = manifest_content.get('data', [])
         missing_files = []
+
         for data_file in data_files:
             full_file_path = os.path.normpath(os.path.join(os.path.dirname(file_path), data_file))
-            print(full_file_path)
-            sys.exit(1)
             if not os.path.isfile(full_file_path):
                 missing_files.append((data_file, full_file_path))
 
@@ -79,7 +78,7 @@ class ManifestChecker:
                     asset_path = entry
 
                 full_glob_path = os.path.dirname(os.path.dirname(file_path))+"/"+asset_path
-                full_glob_path = full_glob_path.replace('/','\\')
+                full_glob_path = full_glob_path.replace('/','/')
                 matches = glob.glob(full_glob_path, recursive=True)
                 if not matches:
                     missing_files.append((asset_path, full_glob_path, bundle_name))
