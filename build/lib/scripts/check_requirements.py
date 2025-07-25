@@ -79,6 +79,7 @@ class ManifestChecker:
 
                 full_glob_path = os.path.dirname(os.path.dirname(file_path))+"/"+asset_path
                 full_glob_path = full_glob_path.replace('/','\\')
+                print(full_glob_path)
                 matches = glob.glob(full_glob_path, recursive=True)
                 if not matches:
                     missing_files.append((asset_path, full_glob_path, bundle_name))
