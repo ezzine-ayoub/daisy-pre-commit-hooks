@@ -52,9 +52,10 @@ class ManifestChecker:
         """Vérifie que tous les fichiers listés dans 'data' existent."""
         data_files = manifest_content.get('data', [])
         missing_files = []
-
         for data_file in data_files:
             full_file_path = os.path.normpath(os.path.join(os.path.dirname(file_path), data_file))
+            print(full_file_path)
+            sys.exit(1)
             if not os.path.isfile(full_file_path):
                 missing_files.append((data_file, full_file_path))
 
@@ -69,6 +70,7 @@ class ManifestChecker:
         """Vérifie que tous les fichiers listés dans 'assets' existent (y compris les 'remove')."""
         assets = manifest_content.get('assets', {})
         missing_files = []
+
         for bundle_name, file_list in assets.items():
             for entry in file_list:
                 if isinstance(entry, tuple) and len(entry) == 2:
@@ -76,22 +78,14 @@ class ManifestChecker:
                 else:
                     asset_path = entry
 
-                base_module_path = os.path.dirname(os.path.dirname(file_path))
-                full_glob_path = os.path.join(base_module_path, asset_path)
-
-                # Remplacer les backslashes pour être compatible avec glob
-                full_glob_path = full_glob_path.replace("\\", "/")
-
+                full_glob_path = os.path.dirname(os.path.dirname(file_path))+"/"+asset_path
+                full_glob_path = full_glob_path.replace('/','\\')
                 matches = glob.glob(full_glob_path, recursive=True)
-
-                if self.debug:
-                    print(f"[DEBUG] Recherche glob: {full_glob_path} → Trouvés: {matches}")
-
                 if not matches:
                     missing_files.append((asset_path, full_glob_path, bundle_name))
 
         if missing_files:
-            print(f"\n❌ Fichiers d'assets manquants dans {os.path.dirname(os.path.dirname(file_path))}:")
+            print(f"\n❌ Fichiers d'assets manquants dans {file_path}:")
             for asset_path, full_path, bundle in missing_files:
                 print(f"- '{asset_path}' (bundle : {bundle}) n'existe pas.")
                 print(f"  → Chemin attendu : {full_path}")
@@ -101,9 +95,9 @@ class ManifestChecker:
     def check_manifest_file(self, file_path):
         """Vérifie un fichier __manifest__.py spécifique."""
         manifest_content = self._parse_manifest_file(file_path)
-        # self._check_required_fields(manifest_content, file_path)
-        # self._check_data_files(file_path, manifest_content)
-        self._check_assets_files(os.path.dirname(file_path), manifest_content)
+        self._check_required_fields(manifest_content, file_path)
+        self._check_data_files(file_path, manifest_content)
+        self._check_assets_files(file_path, manifest_content)
 
     def check_all_manifest_files(self):
         """Parcourt tout le répertoire pour vérifier tous les fichiers '__manifest__.py'."""
