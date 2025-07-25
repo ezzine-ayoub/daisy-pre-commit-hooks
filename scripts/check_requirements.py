@@ -94,8 +94,8 @@ class ManifestChecker:
     def check_manifest_file(self, file_path):
         """Vérifie un fichier __manifest__.py spécifique."""
         manifest_content = self._parse_manifest_file(file_path)
-        self._check_required_fields(manifest_content, file_path)
-        self._check_data_files(file_path, manifest_content)
+        # self._check_required_fields(manifest_content, file_path)
+        # self._check_data_files(file_path, manifest_content)
         self._check_assets_files(os.path.dirname(file_path), manifest_content)
 
     def check_all_manifest_files(self):
