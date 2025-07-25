@@ -67,8 +67,7 @@ class ManifestChecker:
 
     def _check_assets_files(self, file_path, manifest_content):
         """Vérifie que tous les fichiers listés dans 'assets' existent (y compris les 'remove')."""
-        print(f"{os.path.join(os.path.dirname(file_path),"../")}")
-        sys.exit(1)
+    
         assets = manifest_content.get('assets', {})
         missing_files = []
 
