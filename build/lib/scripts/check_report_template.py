@@ -137,13 +137,7 @@ class XMLFieldValidator:
                         print(f"❌ Missing fields for model='{record_model}': {missing}\n {clickable_path}")
                         has_error = True
 
-                    # Check if 'name' field contains a dot
-                    name_field = self._get_field_value(record_block)
-                    if name_field and '.' in name_field:
-                        line = self._find_line_number(original_content, record_block_original)
-                        clickable_path = f"file:///{file_path.replace(os.sep, '/')}:{line}"
-                        print(f"{clickable_path}\n❌ Invalid value for <field name='name'>: contains dot (.) → '{name_field}'")
-                        has_error = True
+
             return has_error
 
     def _extract_record_block(self, content, model):

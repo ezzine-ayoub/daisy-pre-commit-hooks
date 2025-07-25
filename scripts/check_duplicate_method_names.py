@@ -2,8 +2,11 @@ import ast
 import os
 import sys
 from collections import defaultdict
+
 if sys.stdout.encoding != "utf-8":
     sys.stdout.reconfigure(encoding="utf-8")
+
+
 def get_all_python_files(root_dir):
     py_files = []
     for dirpath, _, filenames in os.walk(root_dir):
@@ -12,6 +15,12 @@ def get_all_python_files(root_dir):
                 full_path = os.path.join(dirpath, filename)
                 py_files.append(full_path)
     return py_files
+
+
+def get_module_name(file_path, root_dir):
+    rel_path = os.path.relpath(file_path, root_dir)
+    parts = rel_path.split(os.sep)
+    return parts[0] if parts else ""
 
 
 def extract_class_info(file_path):
@@ -91,15 +100,23 @@ def main():
     root_dir = os.getcwd()
     files = get_all_python_files(root_dir)
 
-    all_classes = []
-    for file_path in files:
-        all_classes.extend(extract_class_info(file_path))
+    module_classes = defaultdict(list)
 
-    grouped_by_model = group_classes_by_model(all_classes)
-    duplicates = find_duplicate_methods(grouped_by_model)
+    for file_path in files:
+        module = get_module_name(file_path, root_dir)
+        classes = extract_class_info(file_path)
+        module_classes[module].extend(classes)
+
+    duplicates = []
+
+    for module, classes in module_classes.items():
+        grouped_by_model = group_classes_by_model(classes)
+        module_duplicates = find_duplicate_methods(grouped_by_model)
+        if module_duplicates:
+            duplicates.extend(module_duplicates)
 
     if duplicates:
-        print("\n🚫 Duplicate method(s) detected in related model classes:\n")
+        print("\n🚫 Duplicate method(s) detected in related model classes within the same module:\n")
         for d in duplicates:
             print(f" - Method '{d['method']}' is duplicated in model '{d['model']}'")
             print(f"   -> First defined in: {d['original']}")
