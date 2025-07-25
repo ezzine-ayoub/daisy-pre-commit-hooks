@@ -76,10 +76,8 @@ class ManifestChecker:
                 else:
                     asset_path = entry
 
-                full_glob_path = os.path.dirname(os.path.dirname(file_path))+"/"+asset_path
-                print(full_glob_path)
-                sys.exit(1)
-                full_glob_path = full_glob_path.replace('/','\\')
+                base_module_path = os.path.dirname(os.path.dirname(file_path))
+                full_glob_path = os.path.normpath(os.path.join(base_module_path, asset_path))
                 matches = glob.glob(full_glob_path, recursive=True)
                 print(matches)
                 if not matches:
