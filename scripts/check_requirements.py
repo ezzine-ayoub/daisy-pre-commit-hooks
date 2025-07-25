@@ -80,7 +80,7 @@ class ManifestChecker:
                 # Certains assets peuvent être des clés avec préfixe 'remove'
                 clean_asset = asset.replace("remove:", "") if asset.startswith("remove:") else asset
                 full_path = os.path.normpath(os.path.join(os.path.dirname(file_path), clean_asset))
-                
+                print(full_path)
                 if not os.path.isfile(full_path):
                     missing_files.append((asset, full_path, bundle_name))
 
