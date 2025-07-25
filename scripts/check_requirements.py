@@ -70,7 +70,6 @@ class ManifestChecker:
         assets = manifest_content.get('assets', {})
         missing_files = []
         print(file_path)
-        print(manifest_content)
         sys.exit(1)
         for bundle_name, file_list in assets.items():
             for entry in file_list:
