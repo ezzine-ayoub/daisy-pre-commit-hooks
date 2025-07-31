@@ -40,10 +40,10 @@ pip install pre-commit
 # Initialiser pre-commit dans le projet (nécessite un fichier ..pre-commit-config.yaml)
 pre-commit install
 
-# Exécuter les hooks sur les fichiers modifiés uniquement
+# Exécuter les .hooks sur les fichiers modifiés uniquement
 pre-commit run
 
-# Exécuter les hooks sur tous les fichiers du projet
+# Exécuter les .hooks sur tous les fichiers du projet
 pre-commit run --all-files
 
 # Nettoyer les caches de pre-commit
@@ -51,12 +51,12 @@ pre-commit clean
 
 ```
 ```bash
-exclude: 'daisy-pre-commit-hooks/scripts/.*|odoo18/(check_manifest|wait-for-psql)\.py|check_duplicate_ids\.py|.idea/.*'
+exclude: 'daisy-pre-commit-.hooks/scripts/.*|odoo18/(check_manifest|wait-for-psql)\.py|check_duplicate_ids\.py|.idea/.*'
 repos:
-  #     Standard code quality hooks
+  #     Standard code quality .hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
-    hooks:
+    .hooks:
       - id: trailing-whitespace
         files: '.*|[^.].*'
 
@@ -69,7 +69,7 @@ repos:
 
   - repo: https://github.com/pre-commit/mirrors-pylint
     rev: v3.0.0a5
-    hooks:
+    .hooks:
       - id: pylint
         name: pylint
         entry: pylint
@@ -82,7 +82,7 @@ repos:
 
   - repo: https://github.com/Daisy-Consulting/daisy-pre-commit-hooks
     rev: main
-    hooks:
+    .hooks:
 #      ##########################################################################################
 #      ######################################just for new new ####################################
 #      ##########################################################################################

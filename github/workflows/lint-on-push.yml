@@ -16,7 +16,7 @@ jobs:
                 with:
                     fetch-depth: 2  # Needed to access HEAD~1
 
-            -   name: Setup git credentials for private hooks
+            -   name: Setup git credentials for private .hooks
                 run: |
                     git config --global url."https://${GH_PAT_HOOKS}@github.com/".insteadOf "https://github.com/"
 

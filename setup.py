@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='daisy-pre-commit-hooks',
+    name='daisy-pre-commit-.hooks',
     version='0.1.0',
-    description='Custom Odoo Pre-commit hooks',
+    description='Custom Odoo Pre-commit .hooks',
     author='Your Name',
     packages=find_packages(),
     entry_points={

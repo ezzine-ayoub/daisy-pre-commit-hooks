@@ -24,6 +24,8 @@ def get_module_name(file_path, root_dir):
 
 
 def extract_class_info(file_path):
+    IGNORED_INHERIT_MODELS = {"mail.thread", "mail.activity.mixin"}
+
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             tree = ast.parse(file.read(), filename=file_path)
@@ -47,8 +49,15 @@ def extract_class_info(file_path):
                         if isinstance(target, ast.Name):
                             if target.id == "_name" and isinstance(item.value, ast.Str):
                                 class_data["_name"] = item.value.s
-                            elif target.id == "_inherit" and isinstance(item.value, ast.Str):
-                                class_data["_inherit"] = item.value.s
+                            elif target.id == "_inherit":
+                                if isinstance(item.value, ast.Str):
+                                    class_data["_inherit"] = item.value.s
+                                elif isinstance(item.value, (ast.List, ast.Tuple)):
+                                    inherit_list = []
+                                    for elt in item.value.elts:
+                                        if isinstance(elt, ast.Str):
+                                            inherit_list.append(elt.s)
+                                    class_data["_inherit"] = inherit_list
 
                 if isinstance(item, ast.FunctionDef):
                     try:
@@ -57,8 +66,17 @@ def extract_class_info(file_path):
                         method_code = item.name
                     class_data["methods"][item.name] = method_code.strip()
 
-            if class_data["_name"] or class_data["_inherit"]:
-                classes.append(class_data)
+            # Skip if _name is missing or if _inherit contains ignored models
+            skip = False
+            if class_data["_name"]:
+                if isinstance(class_data["_inherit"], str):
+                    if class_data["_inherit"] in IGNORED_INHERIT_MODELS:
+                        skip = True
+                elif isinstance(class_data["_inherit"], list):
+                    if any(val in IGNORED_INHERIT_MODELS for val in class_data["_inherit"]):
+                        skip = True
+                if not skip:
+                    classes.append(class_data)
     return classes
 
 
@@ -69,8 +87,10 @@ def group_classes_by_model(classes):
         keys = set()
         if cls["_name"]:
             keys.add(cls["_name"])
-        if cls["_inherit"]:
+        if isinstance(cls["_inherit"], str):
             keys.add(cls["_inherit"])
+        elif isinstance(cls["_inherit"], list):
+            keys.update(cls["_inherit"])
         for key in keys:
             model_groups[key].append(cls)
 
