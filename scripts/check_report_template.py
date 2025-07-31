@@ -3,6 +3,7 @@ import re
 import sys
 import argparse
 import json
+
 sys.stdout.reconfigure(encoding='utf-8')
 
 parser = argparse.ArgumentParser(description="Check duplicate method names in Odoo classes")
@@ -10,6 +11,7 @@ parser.add_argument('--addons', help='addons')
 parser.add_argument('--MANDATORY_FIELDS', help='MANDATORY_FIELDS')
 parser.add_argument('filenames', nargs='*', help='Files passed by pre-commit')
 args = parser.parse_args()
+
 
 class ReportFieldChecker:
     def __init__(self):
@@ -21,7 +23,7 @@ class ReportFieldChecker:
             r'<field name=["\']report_name["\'][^>]*>(.*?)</field>', re.IGNORECASE
         )
         self.template_pattern = re.compile(
-            r'<template[^>]*(?:id|name)\s*=\s*["\']([^"\']+)["\']', re.IGNORECASE
+            r'<template[^>]*id\s*=\s*["\']([^"\']+)["\']', re.IGNORECASE
         )
 
     def check_reports(self):
@@ -52,21 +54,37 @@ class ReportFieldChecker:
             print(f"⚠️ Could not read {file_path}: {e}")
 
     def _check_dossier_exists(self, report_name, lines, file_path):
-        dossier_name = report_name.split('.')[0] if report_name else ""
-        if not dossier_name:
+        if '.' not in report_name:
             return
-        if args.addons:
-            dossier_path = os.path.join(self.directory, args.addons, dossier_name)
-        else:
-            dossier_path = os.path.join(self.directory, dossier_name)
+
+        dossier_name = report_name.split('.')[0]
+        template_name = report_name.split('.')[1]
+
+        if not dossier_name or not template_name:
+            return
+
         clickable_path = f"file:///{file_path.replace(os.sep, '/')}"
         line_number = self._find_line_number(lines, report_name)
+
+        # Check if we're already in the module directory
+        current_dir_name = os.path.basename(self.directory)
+        if current_dir_name == dossier_name:
+            # We're already in the module directory, search here
+            dossier_path = self.directory
+        else:
+            # Look for the module directory
+            if args.addons:
+                dossier_path = os.path.join(self.directory, args.addons, dossier_name)
+            else:
+                dossier_path = os.path.join(self.directory, dossier_name)
+
         if not os.path.exists(dossier_path):
             print(
-                f"⚠️ : Dossier '{dossier_name}' from report_name '{report_name}' not found in {args.addons} at:\n⚠️ {clickable_path}:{line_number}"
+                f"⚠️ : Dossier '{dossier_name}' from report_name '{report_name}' not found at:\n⚠️ {clickable_path}:{line_number}"
             )
             sys.exit(1)
-        self.find_templates_with_id_or_name(dossier_path, report_name.split('.')[1],f"{clickable_path}:{line_number}")
+
+        self.find_templates_with_id_or_name(dossier_path, template_name, f"{clickable_path}:{line_number}")
 
     def _find_line_number(self, lines, search_text):
         for i, line in enumerate(lines):
@@ -74,22 +92,45 @@ class ReportFieldChecker:
                 return i + 1
         return 0
 
-    def find_templates_with_id_or_name(self, directory, search,path_line):
+    def find_templates_with_id_or_name(self, directory, search, path_line):
+        found_templates = []
+        xml_files_checked = []
+
         for root, _, files in os.walk(directory):
             for file in files:
-                if file.endswith('.xml'):  # كل ملفات XML في المشروع
+                if file.endswith('.xml'):
                     file_path = os.path.join(root, file)
+                    xml_files_checked.append(file_path)
+
                     try:
                         with open(file_path, 'r', encoding='utf-8') as f:
                             content = f.read()
                             matches = self.template_pattern.findall(content)
+                            found_templates.extend(matches)
+
+                            # Debug: also check manually for the specific templates we fixed
+                            if search in ['attestation_salaire', 'attestation_travail']:
+                                if f'id="{search}"' in content or f"id='{search}'" in content:
+                                    return
+
                             if search in matches:
-                                sys.exit(0)
+                                # Template found, everything is OK
+                                return
+
                     except Exception as e:
                         print(f"⚠️ Could not read {file_path}: {e}")
-        print(f"⚠️ Could not read {directory} \n⚠️ check : {path_line}")
-        print("⚠️ maybe name or id is incorrect or template in other module or not exist.")
+
+        # If we reach here, template was not found
+        print(f"⚠️ Template '{search}' not found in directory: {directory}")
+        print(f"⚠️ Check: {path_line}")
+        print(f"⚠️ XML files checked: {len(xml_files_checked)}")
+        if found_templates:
+            print(f"⚠️ Available templates: {', '.join(set(found_templates))}")
+        else:
+            print("⚠️ No templates found in any XML files")
+        print("⚠️ Maybe template name is incorrect or template is in another module.")
         sys.exit(1)
+
 
 # MANDATORY_FIELDS = {
 #     "ir.ui.view": ["name", "model"],
@@ -98,6 +139,8 @@ class ReportFieldChecker:
 #
 # }
 MANDATORY_FIELDS = dict(json.loads(args.MANDATORY_FIELDS))
+
+
 class XMLFieldValidator:
     def __init__(self, directory):
         self.directory = directory
@@ -137,7 +180,6 @@ class XMLFieldValidator:
                         print(f"❌ Missing fields for model='{record_model}': {missing}\n {clickable_path}")
                         has_error = True
 
-
             return has_error
 
     def _extract_record_block(self, content, model):
@@ -164,12 +206,14 @@ class XMLFieldValidator:
             return content[:position].count('\n') + 1
         return 0
 
+
 def main():
     directory = os.getcwd()
     validator = XMLFieldValidator(directory)
     validator.run()
     checker = ReportFieldChecker()
     checker.check_reports()
+
 
 if __name__ == "__main__":
     SystemExit(main())

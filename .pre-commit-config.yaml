@@ -125,7 +125,7 @@ repos:
 
 #repos:
 #  - repo: local
-#    hooks:
+#    .hooks:
 #      - id: check-duplicate-odoo-methods
 #        name: Check duplicate Odoo model methods
 #        entry: python check_duplicate_method_names.py
